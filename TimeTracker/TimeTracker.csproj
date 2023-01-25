@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <StartupObject>TimeTracker.App</StartupObject>
+    <ApplicationIcon>timer.png.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="timer.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="timer.png.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="6.1.2" />
+    <PackageReference Include="Material.Icons.WPF" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="timer.png" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,58 @@
+﻿<Window x:Class="TimeTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:TimeTracker"
+        mc:Ignorable="d"
+        Title="My TimeTracker"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        MaxWidth="405"
+        MaxHeight="150" Icon="/timer.png">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid
+        Margin="15">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="165"/>
+            <ColumnDefinition MinWidth="100"/>
+            <ColumnDefinition MinWidth="100"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel 
+            Orientation="Vertical"
+            Grid.Column="0">
+            <TextBlock
+                Text="TimeTracker started at:"/>
+            <TextBlock
+                Text="{Binding StartDate, StringFormat='{}{0:dd.MM.yyyy HH:mm dddd}', UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding DisplayStartDate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBlock
+                Text="TimeTracker stopped at:"/>
+            <TextBlock
+                Text="{Binding StopDate, StringFormat='{}{0:dd.MM.yyyy HH:mm dddd}', UpdateSourceTrigger=PropertyChanged}"
+                Visibility="{Binding DisplayStopDate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <TextBlock
+                Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <Button
+            Command="{Binding StartCommand, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding IsStartButtonEnabled}"
+            Grid.Column="1"
+            Width="75"
+            Height="75">
+            <materialIcons:MaterialIcon Kind="PlayArrow"/>
+        </Button>
+        <Button
+            Command="{Binding StopCommand, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding IsStopButtonEnabled}"
+            Grid.Column="2"
+            Width="75"
+            Height="75">
+            <materialIcons:MaterialIcon Kind="Stop"/>
+        </Button>
+    </Grid>
+</Window>
