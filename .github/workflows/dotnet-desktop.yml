@@ -24,9 +24,3 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: sonar-scanner
-  # You may pin to the exact commit or the version.
-  # uses: Warchant/setup-sonar-scanner@3a54371c833a3a8c9b1fb24d590a6396b96a6d93
-  uses: Warchant/setup-sonar-scanner@v4
-  with:
-    # Sonar-scanner version
-    version: # default is 4.6.2.2472
