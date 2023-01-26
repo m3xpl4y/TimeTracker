@@ -18,22 +18,19 @@ namespace TimeTracker
         {
             if (DataContext is MainWindowViewModel vm && !vm.OnClose)
             {
-                e.Cancel = true;
                 var stopCommand = vm.StopCommand;
                 var result = MessageBox.Show("Do you really want to close?", "Close TimeTracker",
                     MessageBoxButton.OKCancel, MessageBoxImage.Question);
                 if (result == MessageBoxResult.OK)
                 {
-                    if (vm.IsStopButtonEnabled)
+                    if (!vm.IsStopButtonEnabled)
                     {
-                        stopCommand!.Execute(e);
+                        e.Cancel = true;
                     }
+                    stopCommand!.Execute(e);
                     e.Cancel = false;
                 }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    e.Cancel = true;
-                }
+
             }
         }
     }
