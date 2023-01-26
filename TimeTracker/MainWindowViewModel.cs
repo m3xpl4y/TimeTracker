@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using System;
 using System.IO;
+using System.Timers;
 
 namespace TimeTracker
 {
@@ -8,6 +9,8 @@ namespace TimeTracker
     {
         public DelegateCommand? StartCommand { get; set; }
         public DelegateCommand? StopCommand { get; set; }
+
+        private readonly Timer _timer;
         private DateTime _today;
         private DateTime _stopDate;
         private bool _isStartButtonEnabled = true;
@@ -19,6 +22,7 @@ namespace TimeTracker
         public MainWindowViewModel()
         {
             InitializeCommands();
+            _timer = new Timer();
         }
 
         private void InitializeCommands()
@@ -30,6 +34,7 @@ namespace TimeTracker
                     DisplayStartDate = true;
                     IsStartButtonEnabled = false;
                     IsStopButtonEnabled = true;
+                    StartDuration();
                     OnStart();
                 });
             StopCommand = new DelegateCommand(
@@ -39,7 +44,7 @@ namespace TimeTracker
                     DisplayStopDate = true;
                     IsStartButtonEnabled = true;
                     IsStopButtonEnabled = false;
-                    CalculateDuration();
+                    StopDuration();
                     OnStop();
                 });
         }
@@ -115,17 +120,20 @@ namespace TimeTracker
                 package.Save();
             }
         }
-
-        private void CalculateDuration()
+        private void StartDuration()
         {
-            if (StartDate < StopDate)
-            {
-                Duration = StopDate - StartDate;
-            }
-            else
-            {
-                Duration = StartDate - StopDate;
-            }
+            _timer.Interval = 1000;
+            _timer.Elapsed += OnTimeEvent;
+            _timer.Enabled = true;
+        }
+        private void StopDuration()
+        {
+            _timer.Enabled = false;
+        }
+
+        private void OnTimeEvent(object? sender, ElapsedEventArgs e)
+        {
+            Duration += new TimeSpan(0, 0, 1);
         }
 
         #endregion
