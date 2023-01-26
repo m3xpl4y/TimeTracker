@@ -70,7 +70,6 @@ namespace TimeTracker
                     sheet.DeleteRow(lastRow);
                     sheet.Cells[lastRow, 1].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
                     sheet.Cells[$"A{lastRow}"].Value = StartDate;
-                    sheet.Cells.AutoFitColumns();
                 }
                 else
                 {
@@ -80,8 +79,8 @@ namespace TimeTracker
                     sheet.Cells[$"B1"].Value = "End Date & Time";
                     sheet.Cells[$"C1"].Value = "Shift Time";
                     sheet.Cells[$"A2"].Value = StartDate;
-                    sheet.Cells.AutoFitColumns();
                 }
+                sheet.Cells.AutoFitColumns();
                 package.Save();
             }
         }
@@ -92,20 +91,16 @@ namespace TimeTracker
             using (ExcelPackage package = new ExcelPackage(fileInfo))
             {
                 ExcelWorksheet sheet;
-                if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] != null)
-                {
-                    sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
-                    var lastRow = sheet.Dimension.End.Row;
-                    sheet.Cells[lastRow, 2].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
-                    sheet.Cells[lastRow, 3].Style.Numberformat.Format = "HH:mm:ss";
-                    sheet.Cells[$"B{lastRow}"].Value = StopDate;
-                    sheet.Cells[$"C{lastRow}"].Value = Duration;
-                    sheet.Cells.AutoFitColumns();
-                }
-                else
+                if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] == null)
                 {
                     return;
                 }
+                sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
+                var lastRow = sheet.Dimension.End.Row;
+                sheet.Cells[lastRow, 2].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
+                sheet.Cells[lastRow, 3].Style.Numberformat.Format = "HH:mm:ss";
+                sheet.Cells[$"B{lastRow}"].Value = StopDate;
+                sheet.Cells[$"C{lastRow}"].Value = Duration;
 
                 var firstRow = sheet.Dimension.Start.Row;
                 var totalHoursRow = sheet.Dimension.End.Row;
@@ -115,6 +110,8 @@ namespace TimeTracker
                 sheet.Cells[$"C{totalHoursRow}"].Formula = $"=SUM(C{firstRow}:C{sumCell})";
                 sheet.Cells[$"C{totalHoursRow}"].Style.Numberformat.Format = "HH:mm:ss";
                 sheet.Cells[$"C{totalHoursRow}"].Style.Font.Bold = true;
+
+                sheet.Cells.AutoFitColumns();
                 package.Save();
             }
         }
