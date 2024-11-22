@@ -28,31 +28,35 @@ namespace TimeTracker
         private void InitializeCommands()
         {
             StartCommand = new DelegateCommand(
-                (o) =>
-                {
-                    StartDate = DateTime.Now;
-                    DisplayStartDate = true;
-                    IsStartButtonEnabled = false;
-                    IsStopButtonEnabled = true;
-                    StartDuration();
-                    OnStart();
-                });
+                (o) => ExecuteOnStartCommand());
             StopCommand = new DelegateCommand(
-                (o) =>
-                {
-                    StopDate = DateTime.Now;
-                    DisplayStopDate = true;
-                    IsStartButtonEnabled = true;
-                    IsStopButtonEnabled = false;
-                    StopDuration();
-                    OnStop();
-                });
+                (o) => OnStopCommand());
+        }
+
+        private void OnStopCommand()
+        {
+            StopDate = DateTime.Now;
+            DisplayStopDate = true;
+            IsStartButtonEnabled = true;
+            IsStopButtonEnabled = false;
+            StopDuration();
+            OnStop();
+        }
+
+        private void ExecuteOnStartCommand()
+        {
+            StartDate = DateTime.Now;
+            DisplayStartDate = true;
+            IsStartButtonEnabled = false;
+            IsStopButtonEnabled = true;
+            StartDuration();
+            OnStart();
         }
 
         #region Methods
-        private FileInfo CreatePathAndDirectory()
+        private static FileInfo CreatePathAndDirectory()
         {
-            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            var filePath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             var separator = Path.DirectorySeparatorChar;
             var directory = Directory.CreateDirectory(filePath + separator + "TimeTracker");
             var date = DateTime.Now;
@@ -65,60 +69,55 @@ namespace TimeTracker
         {
             var fileInfo = CreatePathAndDirectory();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            using var package = new ExcelPackage(fileInfo);
+            ExcelWorksheet sheet;
+            if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] != null)
             {
-                ExcelWorksheet sheet;
-                if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] != null)
-                {
-                    sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
-                    var lastRow = sheet.Dimension.End.Row;
-                    sheet.DeleteRow(lastRow);
-                    sheet.Cells[lastRow, 1].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
-                    sheet.Cells[$"A{lastRow}"].Value = StartDate;
-                }
-                else
-                {
-                    sheet = package.Workbook.Worksheets.Add(DateTime.Now.ToString("MMMM yyyy"));
-                    sheet.Cells[2, 1].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
-                    sheet.Cells[$"A1"].Value = "Start Date & Time";
-                    sheet.Cells[$"B1"].Value = "End Date & Time";
-                    sheet.Cells[$"C1"].Value = "Shift Time";
-                    sheet.Cells[$"A2"].Value = StartDate;
-                }
-                sheet.Cells.AutoFitColumns();
-                package.Save();
+                sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
+                var lastRow = sheet.Dimension.End.Row;
+                sheet.DeleteRow(lastRow);
+                sheet.Cells[lastRow, 1].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
+                sheet.Cells[$"A{lastRow}"].Value = StartDate;
             }
+            else
+            {
+                sheet = package.Workbook.Worksheets.Add(DateTime.Now.ToString("MMMM yyyy"));
+                sheet.Cells[2, 1].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
+                sheet.Cells[$"A1"].Value = "Start Date & Time";
+                sheet.Cells[$"B1"].Value = "End Date & Time";
+                sheet.Cells[$"C1"].Value = "Shift Time";
+                sheet.Cells[$"A2"].Value = StartDate;
+            }
+            sheet.Cells.AutoFitColumns();
+            package.Save();
         }
         private void OnStop()
         {
             var fileInfo = CreatePathAndDirectory();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            using var package = new ExcelPackage(fileInfo);
+            if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] == null)
             {
-                ExcelWorksheet sheet;
-                if (package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")] == null)
-                {
-                    return;
-                }
-                sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
-                var lastRow = sheet.Dimension.End.Row;
-                sheet.Cells[lastRow, 2].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
-                sheet.Cells[lastRow, 3].Style.Numberformat.Format = "HH:mm:ss";
-                sheet.Cells[$"B{lastRow}"].Value = StopDate;
-                sheet.Cells[$"C{lastRow}"].Value = Duration;
-
-                var firstRow = sheet.Dimension.Start.Row;
-                var totalHoursRow = sheet.Dimension.End.Row;
-                totalHoursRow++;
-                sheet.Cells[$"B{totalHoursRow}"].Value = "Total Hours";
-                var sumCell = totalHoursRow - 1;
-                sheet.Cells[$"C{totalHoursRow}"].Formula = $"=SUM(C{firstRow}:C{sumCell})";
-                sheet.Cells[$"C{totalHoursRow}"].Style.Numberformat.Format = "HH:mm:ss";
-                sheet.Cells[$"C{totalHoursRow}"].Style.Font.Bold = true;
-
-                sheet.Cells.AutoFitColumns();
-                package.Save();
+                return;
             }
+            var sheet = package.Workbook.Worksheets[DateTime.Now.ToString("MMMM yyyy")];
+            var lastRow = sheet.Dimension.End.Row;
+            sheet.Cells[lastRow, 2].Style.Numberformat.Format = "dd-MM-yyyy HH:mm:ss";
+            sheet.Cells[lastRow, 3].Style.Numberformat.Format = "HH:mm:ss";
+            sheet.Cells[$"B{lastRow}"].Value = StopDate;
+            sheet.Cells[$"C{lastRow}"].Value = Duration;
+
+            var firstRow = sheet.Dimension.Start.Row;
+            var totalHoursRow = sheet.Dimension.End.Row;
+            totalHoursRow++;
+            sheet.Cells[$"B{totalHoursRow}"].Value = "Total Hours";
+            var sumCell = totalHoursRow - 1;
+            sheet.Cells[$"C{totalHoursRow}"].Formula = $"=SUM(C{firstRow}:C{sumCell})";
+            sheet.Cells[$"C{totalHoursRow}"].Style.Numberformat.Format = "HH:mm:ss";
+            sheet.Cells[$"C{totalHoursRow}"].Style.Font.Bold = true;
+
+            sheet.Cells.AutoFitColumns();
+            package.Save();
         }
         private void StartDuration()
         {
@@ -159,7 +158,7 @@ namespace TimeTracker
         }
         public bool IsStartButtonEnabled
         {
-            get { return _isStartButtonEnabled; }
+            get => _isStartButtonEnabled;
             set
             {
                 _isStartButtonEnabled = value;
@@ -168,7 +167,7 @@ namespace TimeTracker
         }
         public bool IsStopButtonEnabled
         {
-            get { return _isStopButtonEnabled; }
+            get => _isStopButtonEnabled;
             set
             {
                 _isStopButtonEnabled = value;

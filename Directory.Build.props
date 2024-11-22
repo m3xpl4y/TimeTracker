@@ -1,0 +1,19 @@
+<Project>
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Authors>m3xpl4y</Authors>
+		<Description>A time tracking application</Description>
+		<Version>1.0.0</Version>
+		<FileVersion>1.0.0.0</FileVersion>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<InformationalVersion>1.0.0</InformationalVersion>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<OutputPath>..\..\Build\Binaries\TimeTracker</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+	</PropertyGroup>
+</Project>
